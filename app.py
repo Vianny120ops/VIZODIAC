@@ -137,12 +137,18 @@ def calculate_houses():
         lat       = float(data.get('lat', 0))
         lon       = float(data.get('lon', 0))
         tz_offset = float(data.get('tz_offset', 0))
+        tz_name   = data.get('tz_name', '').strip()
 
         if not date_str:
             return jsonify({'error':'Missing date'}), 400
 
-        dt     = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
-        tz_str = offset_to_tz(tz_offset)
+        dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+        # Usar tz_name si viene del frontend (preciso, cubre todos los países)
+        # Fallback a offset_to_tz solo si no viene tz_name
+        if tz_name:
+            tz_str = tz_name
+        else:
+            tz_str = offset_to_tz(tz_offset)
 
         subject = AstrologicalSubject(
             name   = 'Chart',
